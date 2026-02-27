@@ -1,0 +1,74 @@
+{
+  "Navigation": {
+    "brand": "Dr. Marcos Gómez - Traumatólogo",
+    "links": [
+      { "name": "Inicio", "href": "#header" },
+      { "name": "Sobre Mí", "href": "#about" },
+      { "name": "Servicios", "href": "#services" },
+      { "name": "Reservar Cita", "href": "#appointment" },
+      { "name": "Contacto", "href": "#contact" }
+    ]
+  },
+
+  "Header": {
+    "title": "Dr. Marcos Gómez",
+    "subtitle": "Médico Traumatólogo",
+    "paragraph": "Especialista en tratamiento de lesiones músculo-esqueléticas, fracturas y cirugía ortopédica con más de 15 años de experiencia",
+    "image": "images/doctor.jpg"
+  },
+
+  "About": {
+    "paragraph": "Médico traumatólogo con más de 15 años de experiencia en el tratamiento de lesiones deportivas, fracturas y cirugía reconstructiva.",
+    "education": [
+      "Médico - Universidad de Buenos Aires (UBA)",
+      "Especialista en Traumatología y Ortopedia - Hospital Italiano",
+      "Fellowship en Cirugía de Rodilla y Hombro - Cleveland Clinic, USA",
+      "Maestría en Cirugía Artroscópica - Universidad Austral"
+    ],
+    "specializations": [
+      "Traumatología Deportiva",
+      "Cirugía Artroscópica de Rodilla y Hombro",
+      "Tratamiento de Fracturas Complejas",
+      "Reconstrucción de Ligamentos",
+      "Prótesis de Cadera y Rodilla",
+      "Medicina Regenerativa en Ortopedia"
+    ],
+    "experience": "15+",
+    "experienceText": "Más de 15 años tratando lesiones músculo-esqueléticas con tecnología de vanguardia y atención personalizada."
+  
+  },
+
+  "Services": [
+    {
+      "name": "Traumatología Deportiva",
+      "text": "Tratamiento especializado de lesiones deportivas y rehabilitación"
+    },
+    {
+      "name": "Cirugía Ortopédica",
+      "text": "Procedimientos quirúrgicos de última generación"
+    },
+    {
+      "name": "Fracturas y Lesiones",
+      "text": "Diagnóstico y tratamiento de fracturas complejas"
+    },
+    {
+      "name": "Artroscopía",
+      "text": "Cirugía mínimamente invasiva de rodilla y hombro"
+    },
+    {
+      "name": "Prótesis Articulares",
+      "text": "Reemplazo de cadera y rodilla"
+    },
+    {
+      "name": "Rehabilitación",
+      "text": "Planes personalizados de recuperación"
+    }
+  ],
+
+  "Contact": {
+    "address": "Tte. Gral. Juan Domingo Perón 4190, C1199 Cdad. Autónoma de Buenos Aires",
+    "phone": "+54 11 4959-0200",
+    "email": "consultas@drgomez.com.ar",
+    "schedule": "Lun - Vie: 9:00 - 18:00"
+  }
+}
