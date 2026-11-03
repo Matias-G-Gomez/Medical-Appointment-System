@@ -1,3 +1,6 @@
+// Usa DNS públicos para resolver la dirección de MongoDB Atlas
+require('dns').setServers(['8.8.8.8', '1.1.1.1']);
+
 // Para identificar la ruta y manejar solicitudes HTTP
 const express = require('express');
 // Permite la conexión a MongoDB y permite definir esquemas y modelos
