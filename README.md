@@ -1,188 +1,136 @@
-# Medical-Appointment-System
-RESTful medical appointment system with Node.js/Express backend, React frontend and MongoDB database.
+# Sistema de Gestión de Turnos Médicos
 
-# Medical Appointment Management System
+Aplicación web full stack para un consultorio de traumatología. Los pacientes piden turnos online sin registrarse, y el personal del consultorio los gestiona desde un panel protegido con inicio de sesión y permisos por rol.
 
-Full-stack web application for managing medical appointments with public booking system, administrative panel, JWT authentication and automated email notifications.
+> 🔗 **Demo online:** [https://medical-appointment-system-rosy.vercel.app/admin](https://medical-appointment-system-rosy.vercel.app/admin)
+>
+> El backend está en un servidor gratuito: si nadie lo usó en un rato, la primera acción puede tardar alrededor de un minuto. Después funciona normalmente.
 
----
+![Página principal del consultorio](docs/capturas/inicio.png)
 
-## Overview
+## Probar la demo
 
-This system allows patients to request medical appointments without prior registration, while administrative staff can securely manage appointments, users and insurance providers through a protected panel.
+Para entrar al panel, tocá **Iniciar sesión** y usá la cuenta de demostración:
 
-The application follows a client-server architecture using a RESTful API and implements role-based access control with secure authentication.
+| Rol | Email | Contraseña |
+|---|---|---|
+| Secretaría | `maria.garcia@clinica.com` | `secretaria1` |
 
----
+Con esta cuenta podés ver todos los turnos y confirmarlos o cancelarlos. Las funciones de administración, como gestionar usuarios y obras sociales, están reservadas al rol de administrador y se muestran en las capturas.
 
-## Tech Stack
+Los turnos de la demo tienen datos inventados.
 
-### Frontend
-- React
-- Material UI
-- React Router
-- Context API
-- date-fns
+## Funcionalidades
+
+**Para pacientes**
+- Solicitud de turnos sin registro previo.
+- Calendario que bloquea fines de semana y muestra solo los horarios libres.
+- Selección de motivo de consulta y obra social.
+
+**Para el consultorio**
+- Inicio de sesión con **JWT** y contraseñas encriptadas con **bcrypt**.
+- **Permisos por rol**: administrador y secretaría.
+- Panel para ver, confirmar y cancelar turnos, con actualización al instante.
+- Avisos automáticos por **email** al confirmar o cancelar un turno.
+- Gestión de obras sociales y de usuarios (solo administrador).
+
+![Formulario para pedir un turno](docs/capturas/turno.png)
+
+![Panel de gestión de turnos](docs/capturas/panel.png)
+
+## Tecnologías
+
+| Capa | Tecnología |
+|---|---|
+| Frontend | React, Material UI, Context API, date-fns |
+| Backend | Node.js, Express |
+| Base de datos | MongoDB Atlas con Mongoose |
+| Seguridad | JWT, bcrypt, control de acceso por roles |
+| Emails | Nodemailer |
+| Publicación | Vercel (frontend) y Render (backend) |
+
+## Arquitectura
+
+```
+Navegador (React en Vercel)  →  API REST (Express en Render)  →  MongoDB Atlas
+                                         │
+                                 Nodemailer (avisos por email)
+```
+
+El frontend se comunica con el backend mediante una API REST. Las rutas del panel están protegidas por un middleware que valida el token JWT y, en las acciones de administración, el rol del usuario.
+
+## API REST
+
+| Método | Endpoint | Acceso | Descripción |
+|---|---|---|---|
+| POST | `/api/auth/login` | Público | Inicia sesión y devuelve el token |
+| GET | `/api/auth/verify` | Público | Verifica si un token es válido |
+| POST | `/api/citas` | Público | Crea un turno |
+| GET | `/api/citas/disponibilidad` | Público | Indica si una fecha y hora están libres |
+| GET | `/api/citas` | Con sesión | Lista todos los turnos |
+| PUT | `/api/citas/:id/estado` | Con sesión | Confirma o cancela un turno |
+| GET | `/api/obras-sociales` | Público | Lista las obras sociales |
+| POST / PUT / DELETE | `/api/obras-sociales` | Administrador | Gestiona obras sociales |
+| GET / POST / DELETE | `/api/users` | Administrador | Gestiona usuarios del panel |
+
+## Cómo ejecutarlo en local
+
+### Requisitos
+
+- Node.js 18 o superior
+- Una base MongoDB, local o gratuita en [MongoDB Atlas](https://www.mongodb.com/atlas)
 
 ### Backend
-- Node.js
-- Express.js
-- MongoDB (Atlas)
-- Mongoose
-- JSON Web Token (JWT)
-- bcryptjs
-- Nodemailer
-- dotenv
-- CORS
 
----
+1. Entrá a la carpeta e instalá las dependencias:
+   ```bash
+   cd backend
+   npm install
+   ```
+2. Creá un archivo `.env` dentro de `backend`:
+   ```
+   MONGO_URI=mongodb+srv://USUARIO:PASSWORD@tu-cluster.mongodb.net/turnos
+   JWT_SECRET=una_frase_secreta
+   EMAIL_USER=tu_correo@gmail.com
+   EMAIL_PASS=tu_contraseña_de_aplicacion
+   ```
+   `EMAIL_USER` y `EMAIL_PASS` son opcionales: si no están, el sistema funciona igual y omite el envío de emails.
+3. Cargá los datos iniciales y arrancá el servidor:
+   ```bash
+   node initDB.js            # usuarios del panel
+   node initObrasSociales.js # obras sociales
+   node initDemo.js          # turnos de demostración (opcional)
+   npm start
+   ```
+   La API queda en `http://localhost:5000`.
 
-## Main Features
+### Frontend
 
-### Public Module
-- Appointment booking without registration
-- Real-time availability validation
-- Automatic "pending" status assignment
-- Responsive user interface
+En otra terminal:
+```bash
+cd frontend
+npm install
+npm start
+```
+La aplicación se abre en `http://localhost:3000`. Para usar otra dirección de API, definí la variable `REACT_APP_API_URL`.
 
-### Administrative Module
-- Secure login using JWT authentication
-- Role-based access control (Admin / Secretary)
-- Appointment confirmation and cancellation
-- Automatic email notifications for confirmation and cancellation
-- Insurance provider management (CRUD)
-- User management with role assignment (Admin only)
-- Prevention of duplicate bookings
-- Protection against deletion of main administrator
+## Estructura del proyecto
 
----
+```
+├── backend/
+│   ├── middleware/   Validación de token y de rol
+│   ├── models/       Usuario, Cita y Obra Social
+│   ├── routes/       Endpoints de la API
+│   ├── initDB.js, initObrasSociales.js, initDemo.js
+│   └── server.js
+└── frontend/
+    └── src/
+        ├── components/   Secciones de la página, formulario y panel
+        ├── context/      Estado global y llamadas a la API
+        └── config.js     Dirección de la API
+```
 
-## Security Implementation
+## Autor
 
-- JWT authentication with 24-hour expiration
-- Role-based authorization middleware
-- Password hashing using bcrypt (10 salt rounds)
-- Protected API routes
-- Environment variables for sensitive configuration
-- Input validation in frontend and backend
-- CORS configuration for controlled access
-
----
-
-## Architecture
-
-Client-Server Architecture
-
-Frontend (React SPA)  
-→ REST API (Express.js)  
-→ MongoDB Atlas  
-
-Design Pattern: Model-View-Controller (MVC)
-
-- Model: Mongoose schemas (User, Cita, ObraSocial)
-- View: React components
-- Controller: Route handlers and business logic
-
----
-
-## Email Notification System
-
-- Gmail SMTP integration
-- HTML email templates
-- Automatic notifications on appointment confirmation and cancellation
-- Error handling and logging for email operations
-
----
-
-## Installation
-
-### 1. Clone the repository
-
-git clone https://github.com/your-username/medical-appointment-system.git
-
----
-
-### 2. Backend Setup
-
-cd backend  
-npm install  
-
-Create a .env file inside the backend directory with the following variables:
-
-MONGO_URI=your_mongodb_uri  
-JWT_SECRET=your_secret_key  
-EMAIL_USER=your_email  
-EMAIL_PASS=your_app_password  
-
-Initialize database:
-
-node initDB.js  
-node initObrasSociales.js  
-
-Start backend server:
-
-npm start  
-
-Backend runs on:  
-http://localhost:5000  
-
----
-
-### 3. Frontend Setup
-
-cd frontend  
-npm install  
-npm start  
-
-Frontend runs on:  
-http://localhost:3000  
-
----
-
-## Test Credentials
-
-Administrator  
-Email: dr.gomez@clinica.com  
-Password: admin123  
-
----
-
-## API Endpoints
-
-Authentication
-- POST /api/auth/login
-- GET /api/auth/verify
-
-Appointments
-- GET /api/citas
-- POST /api/citas
-- PUT /api/citas/:id/estado
-- GET /api/citas/disponibilidad
-
-Insurance Providers
-- GET /api/obras-sociales
-- POST /api/obras-sociales
-- PUT /api/obras-sociales/:id
-- DELETE /api/obras-sociales/:id
-
-Users (Admin only)
-- GET /api/users
-- POST /api/users
-- DELETE /api/users/:id
-
----
-
-## Database Collections
-
-users  
-citas  
-obrassociales  
-
-Each collection includes automatic timestamps and validation rules.
-
----
-
-## Author
-
-Matías Germán Gómez  
-Software Development Student – UADE
+**Matías Germán Gómez**
+[LinkedIn](https://www.linkedin.com/in/matias-german-gomez/) · [GitHub](https://github.com/Matias-G-Gomez) · [Portfolio](https://matias-gomez-black.vercel.app)
