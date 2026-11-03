@@ -5,6 +5,10 @@ const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Los emails solo se envían si están configurados EMAIL_USER y EMAIL_PASS.
+// En local (con el .env completo) se envían; en la demo online, sin esas variables, se omiten.
+const emailHabilitado = Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
 // Configura transporte de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -12,10 +16,25 @@ const transporter = nodemailer.createTransport({
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
+    // Límite de tiempo para que un email que no puede salir no quede colgado
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
     tls: {
         rejectUnauthorized: false
     }
 });
+
+// Envía un email en segundo plano: la respuesta al frontend no espera a que termine
+const enviarEmail = (mailOptions, tipo) => {
+    if (!emailHabilitado) {
+        console.log(`Email de ${tipo} omitido: EMAIL_USER y EMAIL_PASS no están configurados`);
+        return;
+    }
+    transporter.sendMail(mailOptions)
+        .then(() => console.log(`Email de ${tipo} enviado a ${mailOptions.to}`))
+        .catch((emailError) => console.error(`Error al enviar email de ${tipo}:`, emailError.message));
+};
 
 // GET /api/citas - Obtiene todas las citas (requiere login)
 router.get('/', authMiddleware, async (req, res) => {
@@ -126,12 +145,7 @@ router.put('/:id/estado', authMiddleware, async (req, res) => {
                 `
             };
 
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log(`Email de confirmación enviado a ${cita.correoElectronico}`);
-            } catch (emailError) {
-                console.error('Error al enviar email de confirmación:', emailError);
-            }
+            enviarEmail(mailOptions, 'confirmación');
         } else if (estado === 'cancelada') {
             // Email de cancelación
             const mailOptions = {
@@ -154,17 +168,13 @@ router.put('/:id/estado', authMiddleware, async (req, res) => {
                 `
             };
 
-            try {
-                await transporter.sendMail(mailOptions);
-                console.log(`Email de cancelación enviado a ${cita.correoElectronico}`);
-            } catch (emailError) {
-                console.error('Error al enviar email de cancelación:', emailError);
-            }
+            enviarEmail(mailOptions, 'cancelación');
         }
 
         res.json({
             message: 'Estado actualizado exitosamente',
-            cita
+            cita,
+            emailEnviado: emailHabilitado
         });
 
     } catch (error) {

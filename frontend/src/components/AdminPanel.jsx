@@ -35,7 +35,7 @@ import { useAppContext } from '../context/AppContext';
 import { API_URL } from '../config';
 
 export const AdminPanel = ({ user, onClose }) => {
-  const { citas, obrasSociales, setObrasSociales, eliminarObraSocial, cargarCitas } = useAppContext();
+  const { citas, obrasSociales, setObrasSociales, eliminarObraSocial, actualizarEstadoCita } = useAppContext();
   
   // Estados
   const [tabValue, setTabValue] = useState(0);
@@ -194,10 +194,14 @@ export const AdminPanel = ({ user, onClose }) => {
       });
 
       if (response.ok) {
-        await cargarCitas();
+        const data = await response.json();
+        // Actualiza el estado en la tabla al instante, sin volver a cargar toda la lista
+        actualizarEstadoCita(cita._id, 'confirmada');
         setSnackbar({
           open: true,
-          message: `Cita confirmada y email enviado a ${cita.correoElectronico}`,
+          message: data.emailEnviado
+            ? `Cita confirmada y email enviado a ${cita.correoElectronico}`
+            : 'Cita confirmada',
           severity: 'success'
         });
       } else {
@@ -229,10 +233,14 @@ export const AdminPanel = ({ user, onClose }) => {
       });
 
       if (response.ok) {
-        await cargarCitas();
+        const data = await response.json();
+        // Actualiza el estado en la tabla al instante, sin volver a cargar toda la lista
+        actualizarEstadoCita(cita._id, 'cancelada');
         setSnackbar({
           open: true,
-          message: `Cita cancelada y email enviado a ${cita.correoElectronico}`,
+          message: data.emailEnviado
+            ? `Cita cancelada y email enviado a ${cita.correoElectronico}`
+            : 'Cita cancelada',
           severity: 'info'
         });
       } else {
